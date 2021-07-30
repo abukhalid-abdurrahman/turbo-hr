@@ -1,3 +1,12 @@
 from django.contrib import admin
+from turboHrBotApp.models import Attendance
 
-# Register your models here.
+@admin.register(Attendance)
+class AttendanceAdmin(admin.ModelAdmin):
+    list_display=(
+        'UserName', 
+        'UserFullName', 
+        'TimeStamp',
+        'StartDate',
+        'EndDate'
+    )
