@@ -1,5 +1,6 @@
 from django.contrib import admin
-from turboHrBotApp.models import Attendance
+from .forms import AttendanceForm
+from .models import Attendance
 
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
@@ -10,3 +11,4 @@ class AttendanceAdmin(admin.ModelAdmin):
         'StartDate',
         'EndDate'
     )
+    form = AttendanceForm
