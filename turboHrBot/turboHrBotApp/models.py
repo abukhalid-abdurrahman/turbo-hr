@@ -19,4 +19,7 @@ class Attendance(models.Model):
     EndDate = models.DateTimeField(
         verbose_name='End Time of Work'
     )
+
+    class Meta:
+        verbose_name = 'Employee Attendance Information'
      
