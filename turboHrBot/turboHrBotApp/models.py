@@ -20,6 +20,9 @@ class Attendance(models.Model):
         verbose_name='End Time of Work'
     )
 
+    def __str__(self):
+        return f'{self.UserName} - {self.UserFullName}'
+
     class Meta:
         verbose_name = 'Employee Attendance Information'
      
