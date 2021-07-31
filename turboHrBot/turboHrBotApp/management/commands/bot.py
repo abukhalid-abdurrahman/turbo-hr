@@ -22,13 +22,14 @@ def log_errors(f):
 
 @log_errors
 def startHandler(update: Update, context: CallbackContext):
+    userId = update.message.from_user.id
+    userName = update.message.from_user.username
+    userFullName = update.message.from_user.full_name
     today = date.today()
     timeStamp = today.strftime("%d/%m/%Y")
     startNow = datetime.now()
 
-    rowCount = Attendance.objects.filter(UserId=update.message.from_user.id, TimeStamp=timeStamp).count()
-
-    if rowCount.real > 0:
+    if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False):
         reply_text = 'Thank You, but you already start your work today 🙂'
         update.message.reply_text(
             text=reply_text
@@ -36,9 +37,9 @@ def startHandler(update: Update, context: CallbackContext):
         return
 
     Attendance(
-        UserId = update.message.from_user.id,
-        UserName = update.message.from_user.username,
-        UserFullName = update.message.from_user.full_name,
+        UserId = userId,
+        UserName = userName,
+        UserFullName = userFullName,
         TimeStamp = timeStamp,
         StartDate = startNow.strftime("%d/%m/%Y %H:%M:%S")
     ).save()
@@ -50,22 +51,32 @@ def startHandler(update: Update, context: CallbackContext):
 
 @log_errors
 def endHandler(update: Update, context: CallbackContext):
+    userId = update.message.from_user.id
     today = date.today()
     timeStamp = today.strftime("%d/%m/%Y")
-    startNow = datetime.now()
-    
-    entity, _ = Attendance.objects.get_or_create(
-        UserId = update.message.from_user.id,
-        defaults= {
-            'UserId': update.message.from_user.id,
-            'UserName': update.message.from_user.username,
-            'UserFullName': update.message.from_user.full_name,
-            'TimeStamp': timeStamp,
-            'StartDate': startNow.strftime("%d/%m/%Y %H:%M:%S")
-        }
-    )
+    endNow = datetime.now()
 
-    reply_text = 'Oh, you\'re done, have a good rest!'
+    if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False) is False:
+        reply_text = 'Stop, but you didn\'t start your work today!'
+        update.message.reply_text(
+            text=reply_text
+        )
+        return
+
+    if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=False, StartDate__isnull=False):
+        reply_text = 'Thank you, but you have already warned me about the end of work!'
+        update.message.reply_text(
+            text=reply_text
+        )
+        return
+
+    entityAttendance = Attendance.objects.get(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False)
+    entityAttendance.EndDate = endNow
+    entityAttendance.save()
+
+    deltaTime = entityAttendance.EndDate.hour - entityAttendance.StartDate.hour
+
+    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {deltaTime} hourse'
     update.message.reply_text(
         text=reply_text
     )
