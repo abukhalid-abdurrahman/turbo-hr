@@ -22,7 +22,7 @@ def log_errors(f):
 
 @log_errors
 def startHandler(update: Update, context: CallbackContext):
-    pass
+    count = Attendance.objects.filter(UserName='').count()
 
 @log_errors
 def endHandler(update: Update, context: CallbackContext):
