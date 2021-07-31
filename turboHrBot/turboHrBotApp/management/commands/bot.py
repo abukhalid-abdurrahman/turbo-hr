@@ -3,7 +3,9 @@ from django.conf import settings
 from telegram import Bot, chat, update
 from telegram import Update
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
+from telegram.ext.commandhandler import CommandHandler
 from telegram.utils.request import Request
+from datetime import date, datetime
 
 from turboHrBotApp.models import Attendance
 
@@ -19,11 +21,42 @@ def log_errors(f):
 
 
 @log_errors
+def startHandler(update: Update, context: CallbackContext):
+    pass
+
+@log_errors
+def endHandler(update: Update, context: CallbackContext):
+    pass
+
+@log_errors
 def handleMessage(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     text = update.message.text
 
-    reply_text = 'Test'
+    today = date.today()
+    timeStamp = today.strftime("%d/%m/%Y")
+    startNow = datetime.now()
+    
+    entity, _ = Attendance.objects.get_or_create(
+        UserId = update.message.from_user.id,
+        defaults= {
+            'UserId': update.message.from_user.id,
+            'UserName': update.message.from_user.username,
+            'UserFullName': update.message.from_user.full_name,
+            'TimeStamp': timeStamp,
+            'StartDate': startNow.strftime("%d/%m/%Y %H:%M:%S")
+        }
+    )
+
+    Attendance.objects.get_or_create(
+        UserId = update.message.from_user.id,
+        UserName = update.message.from_user.username,
+        UserFullName = update.message.from_user.full_name,
+        TimeStamp = timeStamp,
+        StartDate = startNow.strftime("%d/%m/%Y %H:%M:%S")
+    ).save()
+
+    reply_text = 'Thank You! Have A Good Day!'
     update.message.reply_text(
         text=reply_text
     )
@@ -49,6 +82,12 @@ class Command(BaseCommand):
 
         message_handler = MessageHandler(Filters.text, handleMessage)
         updater.dispatcher.add_handler(message_handler)
+
+        startCommandHandler = CommandHandler('start', startHandler)
+        updater.dispatcher.add_handler(startCommandHandler)
+
+        endCommandHandler = CommandHandler('end', endHandler)
+        updater.dispatcher.add_handler(endCommandHandler)
 
         updater.start_polling()
         update.idle()
