@@ -22,17 +22,34 @@ def log_errors(f):
 
 @log_errors
 def startHandler(update: Update, context: CallbackContext):
-    count = Attendance.objects.filter(UserName='').count()
+    today = date.today()
+    timeStamp = today.strftime("%d/%m/%Y")
+    startNow = datetime.now()
+
+    rowCount = Attendance.objects.filter(UserId=update.message.from_user.id, TimeStamp=timeStamp).count()
+
+    if rowCount.real > 0:
+        reply_text = 'Thank You, but you already start your work today 🙂'
+        update.message.reply_text(
+            text=reply_text
+        )
+        return
+
+    Attendance(
+        UserId = update.message.from_user.id,
+        UserName = update.message.from_user.username,
+        UserFullName = update.message.from_user.full_name,
+        TimeStamp = timeStamp,
+        StartDate = startNow.strftime("%d/%m/%Y %H:%M:%S")
+    ).save()
+
+    reply_text = 'Thank You! Have a productive day!'
+    update.message.reply_text(
+        text=reply_text
+    )
 
 @log_errors
 def endHandler(update: Update, context: CallbackContext):
-    pass
-
-@log_errors
-def handleMessage(update: Update, context: CallbackContext):
-    chat_id = update.message.chat_id
-    text = update.message.text
-
     today = date.today()
     timeStamp = today.strftime("%d/%m/%Y")
     startNow = datetime.now()
@@ -48,15 +65,14 @@ def handleMessage(update: Update, context: CallbackContext):
         }
     )
 
-    Attendance.objects.get_or_create(
-        UserId = update.message.from_user.id,
-        UserName = update.message.from_user.username,
-        UserFullName = update.message.from_user.full_name,
-        TimeStamp = timeStamp,
-        StartDate = startNow.strftime("%d/%m/%Y %H:%M:%S")
-    ).save()
+    reply_text = 'Oh, you\'re done, have a good rest!'
+    update.message.reply_text(
+        text=reply_text
+    )
 
-    reply_text = 'Thank You! Have A Good Day!'
+@log_errors
+def handleMessage(update: Update, context: CallbackContext):
+    reply_text = 'It seems that I did not understand you, you better tell me when you start or finish work 🙂'
     update.message.reply_text(
         text=reply_text
     )
