@@ -111,3 +111,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TOKEN = '1939961435:AAFoj2e16czObpHROiHPaTMY5-mteE7sqaU'
+PROXY_URL = 'https://telegg.ru/orig/bot'
