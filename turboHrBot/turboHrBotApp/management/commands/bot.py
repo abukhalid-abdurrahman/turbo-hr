@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from telegram import Bot, update
+from telegram import Bot, message, update
 from telegram import Update
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
 from telegram.ext.commandhandler import CommandHandler
@@ -39,8 +39,8 @@ def startHandler(update: Update, context: CallbackContext):
         UserName = userName,
         UserFullName = userFullName,
         TimeStamp = timeStamp,
-        StartDate = datetime.now()
-        
+        StartDate = datetime.now(),
+        StartLocation = update.message.chat.location.address
     ).save()
 
     reply_text = 'Thank You! Have a productive day!'
@@ -76,6 +76,7 @@ def endHandler(update: Update, context: CallbackContext):
         return 
 
     entityAttendance.EndDate = datetime.now()
+    entityAttendance.EndLocation = update.message.chat.location.address
     entityAttendance.save()
 
     deltaTime = entityAttendance.EndDate - entityAttendance.StartDate
