@@ -1,3 +1,4 @@
+from _typeshed import NoneType
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from telegram import Bot, message, update
@@ -23,6 +24,7 @@ def log_errors(f):
 @log_errors
 def startHandler(update: Update, context: CallbackContext):
     userId = update.message.from_user.id
+    location = update.message.chat.location
     userName = update.message.from_user.username
     userFullName = update.message.from_user.full_name
     timeStamp = date.today()
@@ -34,13 +36,17 @@ def startHandler(update: Update, context: CallbackContext):
         )
         return
 
+    address = 'Not Pointed!'
+    if location is not NoneType:
+        address = location.address
+
     Attendance(
         UserId = userId,
         UserName = userName,
         UserFullName = userFullName,
         TimeStamp = timeStamp,
         StartDate = datetime.now(),
-        StartLocation = update.message.chat.location.address
+        StartLocation = address
     ).save()
 
     reply_text = 'Thank You! Have a productive day!'
@@ -51,6 +57,7 @@ def startHandler(update: Update, context: CallbackContext):
 @log_errors
 def endHandler(update: Update, context: CallbackContext):
     userId = update.message.from_user.id
+    location = update.message.chat.location
     timeStamp = date.today()
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False) is False:
@@ -75,14 +82,15 @@ def endHandler(update: Update, context: CallbackContext):
         )
         return 
 
+    address = 'Not Pointed!'
+    if location is not NoneType:
+        address = location.address
+
     entityAttendance.EndDate = datetime.now()
-    entityAttendance.EndLocation = update.message.chat.location.address
+    entityAttendance.EndLocation = address
     entityAttendance.save()
 
     deltaTime = entityAttendance.EndDate - entityAttendance.StartDate
-    print(datetime)
-    print(entityAttendance.EndDate)
-    print(entityAttendance.StartDate)
     reply_text = f'Oh, you\'re done, have a good rest! Today You worked {4} hours!'
     update.message.reply_text(
         text=reply_text

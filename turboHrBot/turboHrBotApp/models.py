@@ -27,7 +27,6 @@ class Attendance(models.Model):
         verbose_name='End work location',
         null=True
     )
-    
 
     def __str__(self):
         return f'{self.UserName} - {self.UserFullName}'
