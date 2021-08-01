@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.db.models.fields import NullBooleanField
 from telegram import Bot, chat, update
 from telegram import Update
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
@@ -71,12 +72,19 @@ def endHandler(update: Update, context: CallbackContext):
         return
 
     entityAttendance = Attendance.objects.get(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False)
+    if entityAttendance is None:
+        reply_text = 'Ooops! Somethin goes wrong!'
+        update.message.reply_text(
+            text=reply_text
+        )
+        return 
+
     entityAttendance.EndDate = endNow
     entityAttendance.save()
 
     deltaTime = entityAttendance.EndDate.hour - entityAttendance.StartDate.hour
 
-    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {deltaTime} hourse'
+    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {deltaTime} hours!'
     update.message.reply_text(
         text=reply_text
     )
