@@ -11,9 +11,13 @@ class AttendanceForm(forms.ModelForm):
             'UserFullName', 
             'TimeStamp',
             'StartDate',
-            'EndDate'
+            'EndDate',
+            'StartLocation',
+            'EndLocation'
         )
         widgets = {
             'UserName': forms.TextInput,
-            'UserFullName': forms.TextInput
+            'UserFullName': forms.TextInput,
+            'StartLocation': forms.TextInput,
+            'EndLocation': forms.TextInput
         }

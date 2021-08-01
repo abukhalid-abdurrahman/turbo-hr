@@ -10,15 +10,24 @@ class Attendance(models.Model):
     UserFullName = models.TextField(
         verbose_name='Telegram User Full Name'
     )
-    TimeStamp = models.DateTimeField(
+    TimeStamp = models.DateField(
         verbose_name='Date'
     )
     StartDate = models.DateTimeField(
         verbose_name='Start Time of Work'
     )
     EndDate = models.DateTimeField(
-        verbose_name='End Time of Work'
+        verbose_name='End Time of Work',
+        null=True
     )
+    StartLocation = models.TextField(
+        verbose_name='Start work location'
+    )
+    EndLocation = models.TextField(
+        verbose_name='End work location',
+        null=True
+    )
+    
 
     def __str__(self):
         return f'{self.UserName} - {self.UserFullName}'

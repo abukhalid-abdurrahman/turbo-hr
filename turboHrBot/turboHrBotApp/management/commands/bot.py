@@ -1,7 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from django.db.models.fields import NullBooleanField
-from telegram import Bot, chat, update
+from telegram import Bot, update
 from telegram import Update
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
 from telegram.ext.commandhandler import CommandHandler
@@ -26,9 +25,7 @@ def startHandler(update: Update, context: CallbackContext):
     userId = update.message.from_user.id
     userName = update.message.from_user.username
     userFullName = update.message.from_user.full_name
-    today = date.today()
-    timeStamp = today.strftime("%d/%m/%Y")
-    startNow = datetime.now()
+    timeStamp = date.today()
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False):
         reply_text = 'Thank You, but you already start your work today 🙂'
@@ -42,7 +39,8 @@ def startHandler(update: Update, context: CallbackContext):
         UserName = userName,
         UserFullName = userFullName,
         TimeStamp = timeStamp,
-        StartDate = startNow.strftime("%d/%m/%Y %H:%M:%S")
+        StartDate = datetime.now()
+        
     ).save()
 
     reply_text = 'Thank You! Have a productive day!'
@@ -53,9 +51,7 @@ def startHandler(update: Update, context: CallbackContext):
 @log_errors
 def endHandler(update: Update, context: CallbackContext):
     userId = update.message.from_user.id
-    today = date.today()
-    timeStamp = today.strftime("%d/%m/%Y")
-    endNow = datetime.now()
+    timeStamp = date.today()
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False) is False:
         reply_text = 'Stop, but you didn\'t start your work today!'
@@ -79,12 +75,14 @@ def endHandler(update: Update, context: CallbackContext):
         )
         return 
 
-    entityAttendance.EndDate = endNow
+    entityAttendance.EndDate = datetime.now()
     entityAttendance.save()
 
-    deltaTime = entityAttendance.EndDate.hour - entityAttendance.StartDate.hour
-
-    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {deltaTime} hours!'
+    deltaTime = entityAttendance.EndDate - entityAttendance.StartDate
+    print(datetime)
+    print(entityAttendance.EndDate)
+    print(entityAttendance.StartDate)
+    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {4} hours!'
     update.message.reply_text(
         text=reply_text
     )
@@ -106,8 +104,7 @@ class Command(BaseCommand):
         )
         bot = Bot(
             request=req,
-            token=settings.TOKEN,
-            base_url=settings.PROXY_URL
+            token=settings.TOKEN
         )
 
         updater = Updater(
@@ -115,14 +112,13 @@ class Command(BaseCommand):
             use_context=True
         )
 
-        message_handler = MessageHandler(Filters.text, handleMessage)
-        updater.dispatcher.add_handler(message_handler)
-
         startCommandHandler = CommandHandler('start', startHandler)
         updater.dispatcher.add_handler(startCommandHandler)
 
         endCommandHandler = CommandHandler('end', endHandler)
         updater.dispatcher.add_handler(endCommandHandler)
 
+        message_handler = MessageHandler(Filters.text, handleMessage)
+        updater.dispatcher.add_handler(message_handler)
+
         updater.start_polling()
-        update.idle()
