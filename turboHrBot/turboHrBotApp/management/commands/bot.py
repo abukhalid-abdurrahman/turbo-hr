@@ -66,7 +66,7 @@ def endHandler(update: Update, context: CallbackContext):
     location = update.message.chat.location
     timeStamp = date.today()
 
-    if (Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False)) is False:
+    if (Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp)) is False:
         reply_text = 'Stop, but you didn\'t start your work today!'
         update.message.reply_text(
             text=reply_text
