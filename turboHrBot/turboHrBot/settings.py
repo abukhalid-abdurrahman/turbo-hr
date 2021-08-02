@@ -113,4 +113,3 @@ STATIC_URL = '/static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 TOKEN = '1939961435:AAFoj2e16czObpHROiHPaTMY5-mteE7sqaU'
-PROXY_URL = 'https://telegg.ru/orig/bot'
