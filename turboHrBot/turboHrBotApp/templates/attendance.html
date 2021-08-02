@@ -141,16 +141,18 @@
                 </tr>
               </thead>
               <tbody>
+                {% for item in data %}
                 <tr>
-                  <td>1</td>
-                  <td>Lorem</td>
-                  <td>ipsum</td>
-                  <td>dolor</td>
-                  <td>sit</td>
-                  <td>sit</td>
-                  <td>sit</td>
-                  <td>sit</td>
+                  <td>{% item.Id %}</td>
+                  <td>{% item.UserName %}</td>
+                  <td>{% item.UserFullName %}</td>
+                  <td>{% item.TimeStamp %}</td>
+                  <td>{% item.StartDate %}</td>
+                  <td>{% item.EndDate %}</td>
+                  <td>{% item.StartLocation %}</td>
+                  <td>{% item.EndLocation %}</td>
                 </tr>
+                {% endfor %}
               </tbody>
             </table>
           </div>

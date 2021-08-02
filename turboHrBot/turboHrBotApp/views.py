@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from .models import Attendance
 
 def attendance(request):
-    return render(request, 'attendance.html')
+    attendances = Attendance.objects.all()
+    return render(request, 'attendance.html', { 'data': attendances })
