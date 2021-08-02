@@ -143,14 +143,14 @@
               <tbody>
                 {% for item in data %}
                 <tr>
-                  <td>{% item.Id %}</td>
-                  <td>{% item.UserName %}</td>
-                  <td>{% item.UserFullName %}</td>
-                  <td>{% item.TimeStamp %}</td>
-                  <td>{% item.StartDate %}</td>
-                  <td>{% item.EndDate %}</td>
-                  <td>{% item.StartLocation %}</td>
-                  <td>{% item.EndLocation %}</td>
+                  <td>{{ item.Id }}</td>
+                  <td>{{ item.UserName }}</td>
+                  <td>{{ item.UserFullName }}</td>
+                  <td>{{ item.TimeStamp }}</td>
+                  <td>{{ item.StartDate }}</td>
+                  <td>{{ item.EndDate }}</td>
+                  <td>{{ item.StartLocation }}</td>
+                  <td>{{ item.EndLocation }}</td>
                 </tr>
                 {% endfor %}
               </tbody>
