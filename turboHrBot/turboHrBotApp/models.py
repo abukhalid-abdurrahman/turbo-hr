@@ -13,10 +13,10 @@ class Attendance(models.Model):
     TimeStamp = models.DateField(
         verbose_name='Date'
     )
-    StartDate = models.DateTimeField(
+    StartDate = models.TimeField(
         verbose_name='Start Time of Work'
     )
-    EndDate = models.DateTimeField(
+    EndDate = models.TimeField(
         verbose_name='End Time of Work',
         null=True
     )
