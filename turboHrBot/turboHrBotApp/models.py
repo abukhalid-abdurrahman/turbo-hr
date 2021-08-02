@@ -29,7 +29,10 @@ class Attendance(models.Model):
     )
 
     def __str__(self):
-        return f'{self.UserName} - {self.UserFullName}'
+        if self.EndDate__isnull:
+            return f'{self.UserFullName} Started at: {self.StartDate}'
+        else:
+            return f'{self.UserFullName} Started at: {self.StartDate}, finished at: {self.EndDate}'
 
     class Meta:
         verbose_name = 'Employee Attendance Information'
