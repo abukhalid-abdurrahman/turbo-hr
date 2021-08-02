@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.db import models
 
 class Attendance(models.Model):
@@ -29,10 +30,11 @@ class Attendance(models.Model):
     )
 
     def __str__(self):
-        if self.EndDate__isnull:
+        if self.EndDate is None:
             return f'{self.UserFullName} Started at: {self.StartDate}'
         else:
-            return f'{self.UserFullName} Started at: {self.StartDate}, finished at: {self.EndDate}'
+            deltaTime = self.EndDate.second - self.StartDate.second
+            return f'{self.UserFullName} Worked today: {timedelta(seconds=deltaTime)}'
 
     class Meta:
         verbose_name = 'Employee Attendance Information'
