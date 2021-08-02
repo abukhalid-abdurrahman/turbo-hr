@@ -1,4 +1,3 @@
-from _typeshed import NoneType
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from telegram import Bot, message, update
@@ -6,7 +5,7 @@ from telegram import Update
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
 from telegram.ext.commandhandler import CommandHandler
 from telegram.utils.request import Request
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 from turboHrBotApp.models import Attendance
 
@@ -37,7 +36,7 @@ def startHandler(update: Update, context: CallbackContext):
         return
 
     address = 'Not Pointed!'
-    if location is not NoneType:
+    if location is not None:
         address = location.address
 
     Attendance(
@@ -60,7 +59,7 @@ def endHandler(update: Update, context: CallbackContext):
     location = update.message.chat.location
     timeStamp = date.today()
 
-    if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False) is False:
+    if (Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False)) is False:
         reply_text = 'Stop, but you didn\'t start your work today!'
         update.message.reply_text(
             text=reply_text
@@ -83,15 +82,15 @@ def endHandler(update: Update, context: CallbackContext):
         return 
 
     address = 'Not Pointed!'
-    if location is not NoneType:
+    if location is not None:
         address = location.address
 
     entityAttendance.EndDate = datetime.now()
     entityAttendance.EndLocation = address
     entityAttendance.save()
 
-    deltaTime = entityAttendance.EndDate - entityAttendance.StartDate
-    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {4} hours!'
+    deltaTime = entityAttendance.EndDate.second - entityAttendance.StartDate.second
+    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {timedelta(seconds=deltaTime)}!'
     update.message.reply_text(
         text=reply_text
     )
