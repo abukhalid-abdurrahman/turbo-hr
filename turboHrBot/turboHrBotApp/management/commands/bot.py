@@ -35,6 +35,13 @@ def startHandler(update: Update, context: CallbackContext):
         )
         return
 
+    if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=False, StartDate__isnull=False):
+        reply_text = 'You seem to have done enough work today, take a break!'
+        update.message.reply_text(
+            text=reply_text
+        )
+        return
+
     address = 'Not Pointed!'
     if location is not None:
         address = location.address
