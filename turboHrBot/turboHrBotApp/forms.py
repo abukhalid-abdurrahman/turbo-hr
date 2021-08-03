@@ -1,6 +1,18 @@
 from django import forms
-from django.forms import fields
-from .models import Attendance
+from .models import Attendance, UserEventLog
+
+class UserEventLogForm(forms.ModelForm):
+    class Meta:
+        model = UserEventLog
+        fields = (
+            'UserFullName', 
+            'TimeStamp',
+            'Event'
+        )
+        widgets = {
+            'UserFullName': forms.TextInput, 
+            'Event': forms.TextInput
+        }
 
 class AttendanceForm(forms.ModelForm):
     class Meta:

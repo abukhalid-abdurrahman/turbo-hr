@@ -1,6 +1,6 @@
 from django.contrib import admin
-from .forms import AttendanceForm
-from .models import Attendance
+from .forms import AttendanceForm, UserEventLogForm
+from .models import Attendance, UserEventLog
 
 @admin.register(Attendance)
 class AttendanceAdmin(admin.ModelAdmin):
@@ -12,3 +12,12 @@ class AttendanceAdmin(admin.ModelAdmin):
         'EndDate'
     )
     form = AttendanceForm
+
+@admin.register(UserEventLog)
+class UserEventLogAdmin(admin.ModelAdmin):
+    list_display=(
+        'UserFullName', 
+        'TimeStamp',
+        'Event'
+    )
+    form = UserEventLogForm
