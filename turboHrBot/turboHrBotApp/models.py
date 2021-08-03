@@ -9,7 +9,7 @@ class UserEventLog(models.Model):
     )
     Event = models.TextField(
         verbose_name='User Event',
-        null=True
+        max_length=150
     )
     
     def __str__(self):

@@ -7,7 +7,7 @@ from telegram.ext.commandhandler import CommandHandler
 from telegram.utils.request import Request
 from datetime import date, datetime, timedelta
 
-from turboHrBotApp.models import Attendance
+from turboHrBotApp.models import Attendance, UserEventLog
 
 def log_errors(f):
     def inner(*args, **kwargs):
@@ -27,6 +27,12 @@ def startHandler(update: Update, context: CallbackContext):
     userName = update.message.from_user.username
     userFullName = update.message.from_user.full_name
     timeStamp = date.today()
+
+    UserEventLog(
+        UserFullName=userFullName,
+        TimeStamp=datetime.now(),
+        Event=f'Announced the start of work'
+    ).save()
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False):
         reply_text = 'Thank You, but you already start your work today 🙂'
@@ -62,9 +68,16 @@ def startHandler(update: Update, context: CallbackContext):
 
 @log_errors
 def endHandler(update: Update, context: CallbackContext):
+    userFullName = update.message.from_user.full_name
     userId = update.message.from_user.id
     location = update.message.chat.location
     timeStamp = date.today()
+
+    UserEventLog(
+        UserFullName=userFullName,
+        TimeStamp=datetime.now(),
+        Event=f'Announced the end of work'
+    ).save()
 
     if not (Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp)):
         reply_text = 'Stop, but you didn\'t start your work today!'
@@ -104,6 +117,17 @@ def endHandler(update: Update, context: CallbackContext):
 
 @log_errors
 def handleMessage(update: Update, context: CallbackContext):
+    userFullName = update.message.from_user.full_name
+    messageText = update.message.text
+    if len(messageText) > 100:
+        messageText = messageText[:100]
+
+    UserEventLog(
+        UserFullName=userFullName,
+        TimeStamp=datetime.now(),
+        Event=f'Write Message: {messageText}'
+    ).save()
+
     reply_text = 'It seems that I did not understand you, you better tell me when you start or finish work 🙂'
     update.message.reply_text(
         text=reply_text
