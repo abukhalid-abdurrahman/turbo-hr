@@ -4,7 +4,7 @@ class UserEventLog(models.Model):
     UserFullName = models.TextField(
         verbose_name='Telegram User Full Name'
     )
-    TimeStamp = models.DateField(
+    TimeStamp = models.DateTimeField(
         verbose_name='Date'
     )
     Event = models.TextField(
