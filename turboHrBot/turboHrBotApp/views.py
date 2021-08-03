@@ -6,7 +6,26 @@ from .models import Attendance
 import xlwt
 
 def attendance(request):
-    attendances = Attendance.objects.all()
+    sqlRawQuery = 'SELECT * FROM turboHrBotApp_attendance'
+    fullNameFilter = request.GET.get('name-filter')
+    if fullNameFilter is not None:
+        sqlRawQuery += f" WHERE UserFullName = '{fullNameFilter}'"
+    usernameFilter = request.GET.get('username-filter')
+    if usernameFilter is not None:
+        if 'WHERE' in sqlRawQuery:
+            sqlRawQuery += f" AND UserName = '{usernameFilter}'"
+        else:
+            sqlRawQuery += f" WHERE UserName = '{usernameFilter}'"
+
+    dateFilter = request.GET.get('date-filter')
+    if dateFilter is not None:
+        if 'WHERE' in sqlRawQuery:
+            sqlRawQuery += f" AND TimeStamp = date('{dateFilter}')"
+        else:
+            sqlRawQuery += f" WHERE TimeStamp = date('{dateFilter}')"
+
+    attendances = Attendance.objects.raw(sqlRawQuery)
+    print(attendances)
     paginatorInstance = Paginator(attendances, 5)
     pageNumber = request.GET.get('page', 1)
     attendances = paginatorInstance.get_page(pageNumber)
