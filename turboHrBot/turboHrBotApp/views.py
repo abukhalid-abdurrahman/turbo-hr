@@ -1,11 +1,15 @@
 from datetime import datetime
 from django.http.response import HttpResponse
 from django.shortcuts import render
+from django.core.paginator import Paginator
 from .models import Attendance
 import xlwt
 
 def attendance(request):
     attendances = Attendance.objects.all()
+    paginatorInstance = Paginator(attendances, 5)
+    pageNumber = request.GET.get('page', 1)
+    attendances = paginatorInstance.get_page(pageNumber)
     return render(request, 'attendance.html', { 'data': attendances })
 
 def exportExcel(request):
