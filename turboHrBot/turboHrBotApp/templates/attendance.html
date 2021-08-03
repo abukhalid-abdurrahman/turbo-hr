@@ -117,15 +117,30 @@
             <h1 class="h2">Attendance Statistics</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
               <div class="btn-group mr-2">
-                <a href="/exportExcel" class="btn btn-sm btn-outline-secondary">Export EXCEL</a>
+                <a href="/exportExcel?name-filter={{ fullNameFilter }}&username-filter={{ usernameFilter }}&date-filter={{ dateFilter }}" class="btn btn-sm btn-outline-secondary">Export EXCEL</a>
               </div>
             </div>
           </div>
           <div class="table-responsive">
             <form class="form-group mb-3" id="filter-from">
-              <input id="name-filter" name="name-filter" type="text" class="form-control mb-3" placeholder="Input User Full Name to Filter" aria-label="Full Name" aria-describedby="basic-addon2">
-              <input id="username-filter" name="username-filter" type="text" class="form-control mb-3" placeholder="Input User Name to Filter" aria-label="Username" aria-describedby="basic-addon2">
-              <input id="date-filter" name="date-filter" type="date" class="form-control mb-3" placeholder="Input Date to Filter" aria-label="Date" aria-describedby="basic-addon2">
+              <input id="name-filter" name="name-filter" type="text" 
+                     class="form-control mb-3" 
+                     placeholder="Input User Full Name to Filter" 
+                     aria-label="Full Name" 
+                     aria-describedby="basic-addon2"
+                     value="{{ fullNameFilter }}">
+              <input id="username-filter" name="username-filter" type="text" 
+                     class="form-control mb-3" 
+                     placeholder="Input User Name to Filter" 
+                     aria-label="Username" 
+                     aria-describedby="basic-addon2"
+                     value="{{ usernameFilter }}">
+              <input id="date-filter" name="date-filter" type="date" 
+                     class="form-control mb-3" 
+                     placeholder="Input Date to Filter" 
+                     aria-label="Date" 
+                     aria-describedby="basic-addon2"
+                     value="{{ dateFilter }}">
               <button class="btn btn-outline-secondary" type="submit">Filter</button>
             </form>
 
@@ -161,18 +176,18 @@
           <nav aria-label="Pagination">
             <ul class="pagination">
               {% if data.has_previous %}
-                <li class="page-item"><a class="page-link" href="?page={{ data.previous_page_number }}">Previous</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ data.previous_page_number }}&name-filter={{ fullNameFilter }}&username-filter={{ usernameFilter }}&date-filter={{ dateFilter }}">Previous</a></li>
               {% endif %}
 
               {% for page in data.paginator.page_range %}
                 {% if data.number == page %}
-                  <li class="page-item active"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                  <li class="page-item active"><a class="page-link" href="?page={{ page }}&name-filter={{ fullNameFilter }}&username-filter={{ usernameFilter }}&date-filter={{ dateFilter }}">{{ page }}</a></li>
                 {% else %}
-                  <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>
+                  <li class="page-item"><a class="page-link" href="?page={{ page }}&name-filter={{ fullNameFilter }}&username-filter={{ usernameFilter }}&date-filter={{ dateFilter }}">{{ page }}</a></li>
                 {% endif %}
               {% endfor %}
               {% if data.has_next %}
-                <li class="page-item"><a class="page-link" href="?page={{ data.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ data.next_page_number }}&name-filter={{ fullNameFilter }}&username-filter={{ usernameFilter }}&date-filter={{ dateFilter }}">Next</a></li>
               {% endif %}
             </ul>
           </nav>
