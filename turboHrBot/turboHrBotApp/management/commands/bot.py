@@ -105,12 +105,13 @@ def endHandler(update: Update, context: CallbackContext):
     if location is not None:
         address = location.address
 
+    deltaTime = entityAttendance.EndDate.second - entityAttendance.StartDate.second
+    entityAttendance.WorkAmount = timedelta(seconds=deltaTime)
     entityAttendance.EndDate = datetime.now()
     entityAttendance.EndLocation = address
     entityAttendance.save()
 
-    deltaTime = entityAttendance.EndDate.second - entityAttendance.StartDate.second
-    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {timedelta(seconds=deltaTime)}!'
+    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {entityAttendance.WorkAmount}!'
     update.message.reply_text(
         text=reply_text
     )
