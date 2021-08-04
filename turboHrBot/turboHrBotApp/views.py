@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from services import UserEventLogService, AttendanceService
+from .services.AttendanceService import AttendanceService
+from .services.UserEventLogService import UserEventLogService
 userEventLogService = UserEventLogService()
 attendanceService = AttendanceService()
 
@@ -36,7 +37,7 @@ def logs(request):
 def exportLogsExcel(request):
     dateFilter = request.GET.get('date-filter')
     fullNameFilter = request.GET.get('name-filter')
-    response = UserEventLogService.ExportUserEventLogsExcel(fullNameFilter, dateFilter)
+    response = userEventLogService.ExportUserEventLogsExcel(fullNameFilter, dateFilter)
     return response
 
 def exportLogsCsv(request):
