@@ -190,10 +190,6 @@ def exportLogsCsv(request):
         writer.writerow([str(log.id), str(log.UserFullName), str(log.TimeStamp), str(log.Event)])
     return response
 
-
-def exportLogsPdf(request):
-    pass
-
 def exportAttendanceCsv(request):
     response=HttpResponse(content_type='application/text/csv')
     response['Content-Disposition'] = f'attachment; filename=User Event Log-{str(datetime.now())}.csv'
@@ -237,6 +233,3 @@ def exportAttendanceCsv(request):
             attendance.EndDate, attendance.WorkAmount, 
             attendance.StartLocation, attendance.EndLocation])
     return response
-
-def exportAttendancePdf(request):
-    pass
