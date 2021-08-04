@@ -195,7 +195,48 @@ def exportLogsPdf(request):
     pass
 
 def exportAttendanceCsv(request):
-    pass
+    response=HttpResponse(content_type='application/text/csv')
+    response['Content-Disposition'] = f'attachment; filename=User Event Log-{str(datetime.now())}.csv'
+
+    writer = csv.writer(response)
+
+    columns = [
+        'Id', 
+        'User Name', 
+        'Full Name', 
+        'Date', 
+        'Start Time',
+        'End Time',
+        'Work Amount',
+        'Start Location',
+        'End Location' ]
+    writer.writerow(columns)
+
+    sqlRawQuery = 'SELECT * FROM turboHrBotApp_attendance'
+    fullNameFilter = request.GET.get('name-filter')
+    if fullNameFilter is not None and fullNameFilter is not '':
+        sqlRawQuery += f" WHERE UserFullName = '{fullNameFilter}'"
+    usernameFilter = request.GET.get('username-filter')
+    if usernameFilter is not None and usernameFilter is not '':
+        if 'WHERE' in sqlRawQuery:
+            sqlRawQuery += f" AND UserName = '{usernameFilter}'"
+        else:
+            sqlRawQuery += f" WHERE UserName = '{usernameFilter}'"
+
+    dateFilter = request.GET.get('date-filter')
+    if dateFilter is not None and dateFilter is not '':
+        if 'WHERE' in sqlRawQuery:
+            sqlRawQuery += f" AND TimeStamp = date('{dateFilter}')"
+        else:
+            sqlRawQuery += f" WHERE TimeStamp = date('{dateFilter}')"
+
+    attendances = Attendance.objects.raw(sqlRawQuery)
+    for attendance in attendances:
+        writer.writerow([attendance.UserId, attendance.UserName, attendance.UserFullName, 
+            attendance.TimeStamp, attendance.StartDate, 
+            attendance.EndDate, attendance.WorkAmount, 
+            attendance.StartLocation, attendance.EndLocation])
+    return response
 
 def exportAttendancePdf(request):
     pass
