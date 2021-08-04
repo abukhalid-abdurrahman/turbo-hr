@@ -192,7 +192,7 @@ def exportLogsCsv(request):
 
 def exportAttendanceCsv(request):
     response=HttpResponse(content_type='application/text/csv')
-    response['Content-Disposition'] = f'attachment; filename=User Event Log-{str(datetime.now())}.csv'
+    response['Content-Disposition'] = f'attachment; filename=Attendance-{str(datetime.now())}.csv'
 
     writer = csv.writer(response)
 

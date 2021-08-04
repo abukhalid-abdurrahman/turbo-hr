@@ -7,5 +7,6 @@ urlpatterns = [
     path('exportExcel', views.exportExcel),
     path('exportLogsExcel', views.exportLogsExcel),
     path('exportLogsCsv', views.exportLogsCsv),
-    path('exportAttendanceCsv', views.exportAttendanceCsv)
+    path('exportAttendanceCsv', views.exportAttendanceCsv),
+    path('logs', views.logs)
 ]
