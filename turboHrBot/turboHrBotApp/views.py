@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from .models import Attendance, UserEventLog
 import xlwt
+import csv
 
 def logs(request):
     sqlRawQuery = 'SELECT * FROM turboHrBotApp_usereventLog'
@@ -166,7 +167,29 @@ def exportExcel(request):
     return response
 
 def exportLogsCsv(request):
-    pass
+    response=HttpResponse(content_type='application/text/csv')
+    response['Content-Disposition'] = f'attachment; filename=User Event Log-{str(datetime.now())}.csv'
+
+    writer = csv.writer(response)
+    writer.writerow(['Log Id', 'User Full Name', 'Date', 'Event'])
+
+    sqlRawQuery = 'SELECT * FROM turboHrBotApp_usereventLog'
+    fullNameFilter = request.GET.get('name-filter')
+    if fullNameFilter is not None and fullNameFilter is not '':
+        sqlRawQuery += f" WHERE UserFullName = '{fullNameFilter}'"
+    dateFilter = request.GET.get('date-filter')
+    if dateFilter is not None and dateFilter is not '':
+        if 'WHERE' in sqlRawQuery:
+            sqlRawQuery += f" AND TimeStamp = date('{dateFilter}')"
+        else:
+            sqlRawQuery += f" WHERE TimeStamp = date('{dateFilter}')"
+
+    logs = UserEventLog.objects.raw(sqlRawQuery)
+
+    for log in logs:
+        writer.writerow([str(log.id), str(log.UserFullName), str(log.TimeStamp), str(log.Event)])
+    return response
+
 
 def exportLogsPdf(request):
     pass
