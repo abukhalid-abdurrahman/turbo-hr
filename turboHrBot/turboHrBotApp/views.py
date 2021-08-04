@@ -164,3 +164,15 @@ def exportExcel(request):
         workSheet.write(rowIterator, columnIterator + 8, str(item.EndLocation), fontStyle)
     workBook.save(response)
     return response
+
+def exportLogsCsv(request):
+    pass
+
+def exportLogsPdf(request):
+    pass
+
+def exportAttendanceCsv(request):
+    pass
+
+def exportAttendancePdf(request):
+    pass
