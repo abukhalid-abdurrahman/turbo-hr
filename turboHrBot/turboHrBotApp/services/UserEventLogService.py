@@ -1,8 +1,8 @@
 import csv
+import xlwt
 from datetime import datetime
 from django.core.paginator import Paginator
 from django.http.response import HttpResponse
-import xlwt
 from turboHrBotApp.models import UserEventLog
 
 

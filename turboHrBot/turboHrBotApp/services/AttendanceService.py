@@ -1,10 +1,9 @@
 import csv
+import xlwt
 from datetime import datetime
-
 from django.core.paginator import Paginator
 from turboHrBotApp.models import Attendance
 from django.http.response import HttpResponse
-import xlwt
 
 
 class AttendanceService():
