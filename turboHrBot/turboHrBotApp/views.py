@@ -2,8 +2,31 @@ from datetime import datetime
 from django.http.response import HttpResponse
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from .models import Attendance
+from .models import Attendance, UserEventLog
 import xlwt
+
+def logs(request):
+    sqlRawQuery = 'SELECT * FROM turboHrBotApp_usereventLog'
+    fullNameFilter = request.GET.get('name-filter')
+    if fullNameFilter is not None and fullNameFilter is not '':
+        sqlRawQuery += f" WHERE UserFullName = '{fullNameFilter}'"
+    dateFilter = request.GET.get('date-filter')
+    if dateFilter is not None and dateFilter is not '':
+        if 'WHERE' in sqlRawQuery:
+            sqlRawQuery += f" AND TimeStamp = date('{dateFilter}')"
+        else:
+            sqlRawQuery += f" WHERE TimeStamp = date('{dateFilter}')"
+
+    logs = UserEventLog.objects.raw(sqlRawQuery)
+    paginatorInstance = Paginator(logs, 5)
+    pageNumber = request.GET.get('page', 1)
+    logs = paginatorInstance.get_page(pageNumber)
+
+    return render(request, 'logs.html', { 
+        'data': logs,
+        'fullNameFilter': '' if fullNameFilter is None else fullNameFilter,
+        'dateFilter': '' if dateFilter is None else dateFilter
+    }) 
 
 def attendance(request):
     sqlRawQuery = 'SELECT * FROM turboHrBotApp_attendance'
