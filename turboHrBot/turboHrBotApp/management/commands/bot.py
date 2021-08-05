@@ -5,7 +5,7 @@ from telegram import Update
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
 from telegram.ext.commandhandler import CommandHandler
 from telegram.utils.request import Request
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 
 from turboHrBotApp.models import Attendance, UserEventLog
 
@@ -33,8 +33,8 @@ def CheckIn(payload):
 
     UserEventLog(
         UserFullName=userFullName,
-        TimeStamp=datetime.now(),
-        Event=f'Announced the start of work'
+        TimeStamp=timeStamp,
+        Event='Announced the start of work'
     ).save()
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False):
@@ -80,8 +80,8 @@ def CheckOut(payload):
 
     UserEventLog(
         UserFullName=userFullName,
-        TimeStamp=datetime.now(),
-        Event=f'Announced the end of work'
+        TimeStamp=timeStamp,
+        Event='Announced the end of work'
     ).save()
 
     if not (Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp)):
@@ -107,19 +107,18 @@ def CheckOut(payload):
             text=reply_text,
             reply_markup=GetReplyKeyboard()
         )
-        return 
+        return
 
     address = 'Not Pointed!'
     if location is not None:
         address = location.address
 
     entityAttendance.EndDate = datetime.now()
-    deltaTime = entityAttendance.EndDate.second - entityAttendance.StartDate.second
-    entityAttendance.WorkAmount = f'Spent: {timedelta(seconds=deltaTime)}'
+    entityAttendance.WorkAmount = entityAttendance.GetDeltaTime()
     entityAttendance.EndLocation = address
     entityAttendance.save()
 
-    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {timedelta(seconds=deltaTime)}!'
+    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {entityAttendance.WorkAmount}!'
     payload.message.reply_text(
         text=reply_text,
         reply_markup=GetReplyKeyboard()
@@ -151,7 +150,7 @@ def handleMessage(update: Update, context: CallbackContext):
 
     UserEventLog(
         UserFullName=userFullName,
-        TimeStamp=datetime.now(),
+        TimeStamp=date.today(),
         Event=f'Write Message: {messageText}'
     ).save()
 

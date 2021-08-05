@@ -4,14 +4,14 @@ class UserEventLog(models.Model):
     UserFullName = models.TextField(
         verbose_name='Telegram User Full Name'
     )
-    TimeStamp = models.DateTimeField(
+    TimeStamp = models.DateField(
         verbose_name='Date'
     )
     Event = models.TextField(
         verbose_name='User Event',
         max_length=150
     )
-    
+
     def __str__(self):
         return f'{self.UserFullName}: {self.Event}'
 
@@ -51,6 +51,27 @@ class Attendance(models.Model):
         null=True
     )
 
+    def GetDeltaTime(self):
+        totalSeconds = (
+            (
+                self.EndDate.hour*3600
+                +
+                self.EndDate.minute*60
+                +
+                self.EndDate.second
+            ) - (
+                self.StartDate.hour*3600
+                +
+                self.StartDate.minute*60
+                +
+                self.StartDate.second
+            )
+        )
+        hour, totalSeconds = divmod(totalSeconds, 3600)
+        minute, totalSeconds = divmod(totalSeconds, 60)
+        second = totalSeconds
+        return "%02d:%02d:%02d" % (hour, minute, second)
+
     def __str__(self):
         if self.EndDate is None:
             return f'{self.UserFullName} Started at: {self.StartDate}'
@@ -59,4 +80,3 @@ class Attendance(models.Model):
 
     class Meta:
         verbose_name = 'Employee Attendance Information'
-     
