@@ -24,6 +24,7 @@ class AttendanceForm(forms.ModelForm):
             'TimeStamp',
             'StartDate',
             'EndDate',
+            'WorkAmount',
             'StartLocation',
             'EndLocation'
         )

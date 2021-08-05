@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from telegram import Bot
+from telegram import Bot, ReplyKeyboardMarkup
 from telegram import Update
 from telegram.ext import CallbackContext, Filters, MessageHandler, Updater
 from telegram.ext.commandhandler import CommandHandler
@@ -20,12 +20,15 @@ def log_errors(f):
     return inner
 
 
-@log_errors
-def startHandler(update: Update, context: CallbackContext):
-    userId = update.message.from_user.id
-    location = update.message.chat.location
-    userName = update.message.from_user.username
-    userFullName = update.message.from_user.full_name
+def GetReplyKeyboard():
+    buttons = [['Check In', 'Check Out']]
+    return ReplyKeyboardMarkup(buttons, one_time_keyboard=False)
+
+def CheckIn(payload):
+    userId = payload.message.from_user.id
+    location = payload.message.chat.location
+    userName = payload.message.from_user.username
+    userFullName = payload.message.from_user.full_name
     timeStamp = date.today()
 
     UserEventLog(
@@ -36,15 +39,17 @@ def startHandler(update: Update, context: CallbackContext):
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False):
         reply_text = 'Thank You, but you already start your work today 🙂'
-        update.message.reply_text(
-            text=reply_text
+        payload.message.reply_text(
+            text=reply_text,
+            reply_markup=GetReplyKeyboard()
         )
         return
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=False, StartDate__isnull=False):
         reply_text = 'You seem to have done enough work today, take a break!'
-        update.message.reply_text(
-            text=reply_text
+        payload.message.reply_text(
+            text=reply_text,
+            reply_markup=GetReplyKeyboard()
         )
         return
 
@@ -62,15 +67,15 @@ def startHandler(update: Update, context: CallbackContext):
     ).save()
 
     reply_text = 'Thank You! Have a productive day!'
-    update.message.reply_text(
-        text=reply_text
+    payload.message.reply_text(
+        text=reply_text,
+        reply_markup=GetReplyKeyboard()
     )
 
-@log_errors
-def endHandler(update: Update, context: CallbackContext):
-    userFullName = update.message.from_user.full_name
-    userId = update.message.from_user.id
-    location = update.message.chat.location
+def CheckOut(payload):
+    userFullName = payload.message.from_user.full_name
+    userId = payload.message.from_user.id
+    location = payload.message.chat.location
     timeStamp = date.today()
 
     UserEventLog(
@@ -81,23 +86,26 @@ def endHandler(update: Update, context: CallbackContext):
 
     if not (Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp)):
         reply_text = 'Stop, but you didn\'t start your work today!'
-        update.message.reply_text(
-            text=reply_text
+        payload.message.reply_text(
+            text=reply_text,
+            reply_markup=GetReplyKeyboard()
         )
         return
 
     if Attendance.objects.filter(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=False, StartDate__isnull=False):
         reply_text = 'Thank you, but you have already warned me about the end of work!'
-        update.message.reply_text(
-            text=reply_text
+        payload.message.reply_text(
+            text=reply_text,
+            reply_markup=GetReplyKeyboard()
         )
         return
 
     entityAttendance = Attendance.objects.get(UserId=userId, TimeStamp=timeStamp, EndDate__isnull=True, StartDate__isnull=False)
     if entityAttendance is None:
         reply_text = 'Ooops! Somethin goes wrong!'
-        update.message.reply_text(
-            text=reply_text
+        payload.message.reply_text(
+            text=reply_text,
+            reply_markup=GetReplyKeyboard()
         )
         return 
 
@@ -105,21 +113,39 @@ def endHandler(update: Update, context: CallbackContext):
     if location is not None:
         address = location.address
 
-    deltaTime = entityAttendance.EndDate.second - entityAttendance.StartDate.second
-    entityAttendance.WorkAmount = timedelta(seconds=deltaTime)
     entityAttendance.EndDate = datetime.now()
+    deltaTime = entityAttendance.EndDate.second - entityAttendance.StartDate.second
+    entityAttendance.WorkAmount = f'Spent: {timedelta(seconds=deltaTime)}'
     entityAttendance.EndLocation = address
     entityAttendance.save()
 
-    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {entityAttendance.WorkAmount}!'
-    update.message.reply_text(
-        text=reply_text
+    reply_text = f'Oh, you\'re done, have a good rest! Today You worked {timedelta(seconds=deltaTime)}!'
+    payload.message.reply_text(
+        text=reply_text,
+        reply_markup=GetReplyKeyboard()
     )
+
+
+@log_errors
+def startHandler(update: Update, context: CallbackContext):
+    CheckIn(update)
+
+@log_errors
+def endHandler(update: Update, context: CallbackContext):
+    CheckOut(update)
 
 @log_errors
 def handleMessage(update: Update, context: CallbackContext):
     userFullName = update.message.from_user.full_name
     messageText = update.message.text
+
+    if messageText == 'Check In':
+        CheckIn(update)
+        return
+    elif messageText == 'Check Out':
+        CheckOut(update)
+        return
+
     if len(messageText) > 100:
         messageText = messageText[:100]
 
@@ -131,7 +157,8 @@ def handleMessage(update: Update, context: CallbackContext):
 
     reply_text = 'It seems that I did not understand you, you better tell me when you start or finish work 🙂'
     update.message.reply_text(
-        text=reply_text
+        text=reply_text,
+        reply_markup=GetReplyKeyboard()
     )
 
 class Command(BaseCommand):

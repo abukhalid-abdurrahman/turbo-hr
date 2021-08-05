@@ -38,7 +38,8 @@ class Attendance(models.Model):
         verbose_name='End Time of Work',
         null=True
     )
-    WorkAmount = models.TimeField(
+    WorkAmount = models.CharField(
+        max_length=30,
         verbose_name='General Work Time',
         null=True
     )

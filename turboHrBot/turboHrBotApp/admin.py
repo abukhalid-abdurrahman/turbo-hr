@@ -9,7 +9,8 @@ class AttendanceAdmin(admin.ModelAdmin):
         'UserFullName', 
         'TimeStamp',
         'StartDate',
-        'EndDate'
+        'EndDate',
+        'WorkAmount'
     )
     form = AttendanceForm
 
